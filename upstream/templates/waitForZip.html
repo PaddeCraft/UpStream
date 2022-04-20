@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% block title %}{{ title }}Wait for download{% endblock %}
+{% block main %}
+<div class="text-2xl">Please wait for your folder to be packed into a zip-file...</div>
+<br><br>
+<div id="progress"><progress class="progress color-accent w-full"></progress></div>
+<script>
+    const interval = setInterval(function () {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var response = JSON.parse(this.responseText);
+                document.getElementById("progress").innerHTML = '<progress class="progress progress-accent w-full" value="' + response["currentSize"] + '" max="' + response["maxSize"] + '"></progress>';
+                if (response["isProcessing"] == false) {
+                    window.location.href = "/download/~/upstream-tmp/" + encodeURIComponent("{{ processUUID }}") + ".zip";
+                    clearInterval(interval);
+                }
+                }
+            };
+            xmlhttp.open("GET", "/api/isProcessing/{{ processUUID }}", true);
+            xmlhttp.send();
+        }, 2000);
+</script>
+{% endblock %}

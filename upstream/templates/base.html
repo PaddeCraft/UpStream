@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | UpStream</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.1/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <style>
+        .material-icons-outlined {
+            font-size: 18px;
+        }
+        .material-icons-outlined.mdi-24px {
+            font-size: 24px;
+        }
+        .fileUpload {
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body class="p-5">
+    <div class="text-sm breadcrumbs">
+        <ul>
+            <li>
+                <a href="/">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4 mr-2 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                </a>
+            </li>
+        {% for e in breadcrumbs %}
+            <li>
+                <a href="{{ e['link'] }}">
+                    {% if e["type"] == "dir" %}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        class="w-4 h-4 mr-2 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                    </svg>
+                    {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4 mr-2 stroke-current">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    {% endif %}
+                    {{ e["name"] }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <br>
+    {% block main %}
+    {% endblock %}
+</body>
+
+</html>
