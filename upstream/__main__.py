@@ -9,6 +9,7 @@ from flask import (
     stream_with_context,
 )
 from werkzeug.utils import secure_filename
+from upstream.sourceCodeFormats import formats as sourceCodeFormats
 from upstream.__init__ import VERSION
 from upstream.getFileIcon import getFileIcon
 from datetime import datetime
@@ -105,33 +106,26 @@ def getDirSize(pth):
     return dirTreeSize
 
 
-def scanDir(dir: str, depth: int = 0, oldFileList: list = []) -> list:
-    fileList = oldFileList
-    indexed = []
-    found = 0
-    for i in glob.glob(os.path.join(dir, "*" + ("/*" * depth))):
-        found += 1
-        indexed.append(i.lower().replace("\\", "/"))
-    if found == 0:
-        return fileList
-    else:
-        fileList += indexed
-        scanDir(dir, depth + 1, fileList)
+def scanDir(dir) -> list:
+    files = []
+    for root, _, files in os.walk(dir):
+        for file in files:
+            yield os.path.join(root, file)
 
 
-def zipFolder(path, processUUID):
+
+def zipFolder(path, files, processUUID):
     global zippingProcesses
     zippingProcesses.append({"uuid": processUUID, "path": path})
     with zipfile.ZipFile(
         os.path.join(basePath, "upstream-tmp", f"{processUUID}.zip"),
         "w",
     ) as zipf:
-        for root, _, files in os.walk(path):
-            for file in files:
-                zipf.write(
-                    os.path.join(root, file),
-                    os.path.join(root, file).replace("\\", "/").replace(path, ""),
-                )
+        for file in files:
+            zipf.write(
+                file,
+                file.replace("\\", "/").replace(path, ""),
+            )
     # https://stackoverflow.com/a/43049879
     zippingProcesses.pop(
         list(map(itemgetter("uuid"), zippingProcesses)).index(processUUID)
@@ -187,15 +181,39 @@ def explore(path):
             currentPath=path.replace("\\", "/"),
         )
     else:
-        return "Not implemented yet"
+        pth = getPath(path)
+        ext = pathlib.Path(pth).suffix.lower()[1:]
+        dwnLoadPath = "/download/" + path
+        if ext == "pdf":
+            return render_template(
+                "preview/pdf.html",
+                file=dwnLoadPath,
+                breadcrumbs=breadcrumbGenerator(pth),
+            )
+        elif ext in ["jpg", "jpeg", "png", "gif"]:
+            return render_template(
+                "preview/image.html",
+                file=dwnLoadPath,
+                breadcrumbs=breadcrumbGenerator(pth),
+            )
+        elif ext in sourceCodeFormats:
+            return render_template(
+                "preview/code.html",
+                file=dwnLoadPath,
+                breadcrumbs=breadcrumbGenerator(pth),
+            )
+        else:
+            return redirect(dwnLoadPath)
+
 
 
 @app.route("/download/<path:path>")
 def download(path):
     global zippingProcesses
     pth = getPath(path)
+    log.info(f"New download from path {pth}")
     if os.path.isfile(pth):
-        # return send_file(pth, as_attachment=True)
+        log.info(f"Sending single file")
         return Response(
             stream_with_context(read_file_chunks(pth)),
             headers={
@@ -203,19 +221,34 @@ def download(path):
             },
         )
     else:
+        filesToZip = []
+        requestedFileStr = request.args.get("files")
+        if requestedFileStr == "*":
+            filesToZip = [x for x in scanDir(pth)]
+        else:
+            elements = requestedFileStr.split("||")
+            for element in elements:
+                if os.path.isfile(os.path.join(pth, element)):
+                    filesToZip.append(os.path.join(pth, element))
+                else:
+                    for file in scanDir(os.path.join(pth, element)):
+                        filesToZip.append(file)
         zipProcessUUID = str(uuid())
-        threading.Thread(args=(pth, zipProcessUUID), target=zipFolder).start()
+        threading.Thread(args=(pth, filesToZip, zipProcessUUID), target=zipFolder).start()
+        log.info(f"Zipping {len(filesToZip)} files")
+        log.info(f"Zipping process UUID: {zipProcessUUID}")
+        print("")
         time.sleep(1)
-        return render_template("waitForZip.html", processUUID=zipProcessUUID)
+        return render_template("waitForZip.html", processUUID=zipProcessUUID, path=pth)
 
 
 @app.route("/upload/<path:path>", methods=["POST"])
 def upload(path):
     if 'file' not in request.files:
         return abort(400)
+    file = request.files['file']
     if file.filename == '':
         return redirect(f"/explore/{path}")
-    file = request.files['file']
     filename = secure_filename(file.filename)
     fp = os.path.join(getPath(path), filename)
     while os.path.exists(fp):
@@ -224,30 +257,28 @@ def upload(path):
     return redirect(f"/explore/{path}")
 
 
-@app.route("/view/<path:path>")
-def view(path):
-    pass
-
-
 @app.route("/api/isProcessing/<_uuid>")
 def isProcessing(_uuid):
     global zippingProcesses
     isStillProcessing = True
     maxSize = 0
+    size = 0
     try:
         # https://stackoverflow.com/a/43049879
         dictForUUID = zippingProcesses[
             list(map(itemgetter("uuid"), zippingProcesses)).index(_uuid)
         ]
         maxSize = getDirSize(dictForUUID["path"])
+        size = os.path.getsize(
+            os.path.join(basePath, "upstream-tmp", f"{_uuid}.zip")
+        ),
     except ValueError:
         isStillProcessing = False
+    
     return json.dumps(
         {
             "isProcessing": isStillProcessing,
-            "currentSize": os.path.getsize(
-                os.path.join(basePath, "upstream-tmp", f"{_uuid}.zip")
-            ),
+            "currentSize": size, 
             "maxSize": maxSize,
         }
     )

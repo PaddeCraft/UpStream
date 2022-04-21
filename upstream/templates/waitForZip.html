@@ -11,8 +11,11 @@
                 var response = JSON.parse(this.responseText);
                 document.getElementById("progress").innerHTML = '<progress class="progress progress-accent w-full" value="' + response["currentSize"] + '" max="' + response["maxSize"] + '"></progress>';
                 if (response["isProcessing"] == false) {
-                    window.location.href = "/download/~/upstream-tmp/" + encodeURIComponent("{{ processUUID }}") + ".zip";
                     clearInterval(interval);
+                    window.location.href = "/download/~/upstream-tmp/" + encodeURIComponent("{{ processUUID }}") + ".zip";
+                    setTimeout(function () {
+                        window.location.href = "/explore/{{ path }}";
+                    }, 1000);
                 }
                 }
             };

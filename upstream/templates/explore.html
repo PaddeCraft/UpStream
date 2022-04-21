@@ -1,6 +1,21 @@
 {% extends 'base.html' %}{% block title %}{{ title }} | Explore{% endblock %}
 {% block main %}
-<div style="display: table"><div style="display: table-cell"><a href="/download/{{ currentPath }}"><span class="material-icons-outlined mdi-24px">file_download</span></a></div><div style="display: table-cell" class="pl-10"><form method=post action="/upload/{{ currentPath }}" enctype=multipart/form-data>
+<script>    
+    dwnLoadPath = new URL(location.protocol + '//' + location.host + "/download/{{ currentPath }}");
+    function dwnload() {
+        // https://stackoverflow.com/a/61598154
+        const checkedBoxes = [...document.querySelectorAll('.filesel:checked')].map(e => e.value);
+        if (checkedBoxes.length > 0) {
+            const checkedBoxesString = checkedBoxes.join('||');
+            dwnLoadPath.searchParams.set("files", checkedBoxesString);
+        } else {
+            dwnLoadPath.searchParams.set("files", "*");
+        }
+        console.log("Your Path: " + dwnLoadPath.href);
+        window.location.href = dwnLoadPath.href;
+    }
+</script>
+<div style="display: table"><div style="display: table-cell"><span onclick="dwnload()"><span class="material-icons-outlined mdi-24px">file_download</span></span></div><div style="display: table-cell" class="pl-10"><form method=post action="/upload/{{ currentPath }}" enctype=multipart/form-data>
     <label for="fileUpload"><span class="material-icons-outlined mdi-24px">checklist_rtl</span></label>
     <input class="btn fileUpload" id = "fileUpload" type=file name=file>
     <!--- <label for="fileUploadSubmit"><span class="material-icons-outlined mdi-24px">file_upload</span></label> --->
@@ -21,10 +36,10 @@
         <tbody>
             {% for file in files %}
             <tr>
-                <th><a href="/explore/{{ file['link'] }}"><span class="material-icons-outlined">{{ file["icon"] }}</span> {{ file["name"] }}</a></th>
+                <th><input type="checkbox" class="checkbox filesel" value="{{ file['name'] }}"><span class="pr-5"></span><a href="/explore/{{ file['link'] }}"><span class="material-icons-outlined">{{ file["icon"] }}</span> {{ file["name"] }}</a></th>
                 <td>{{ file["size"] }}</td>
                 <td>{{ file["date"] }}</td>
-                <td><a href="/download/{{ file['link'] }}"><span class="material-icons-outlined">file_download</span></a></td>
+                <td><a href="/download/{{ file['link'] }}?files=*"><span class="material-icons-outlined">file_download</span></a></td>
             </tr>
             {% endfor %}
         </tbody>

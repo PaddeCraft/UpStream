@@ -1,3 +1,5 @@
+from upstream.sourceCodeFormats import formats as sourceCodeFormats
+
 def getFileIcon(ext):
     if ext in ["jpg", "jpeg", "png", "gif", "bmp"]:
         return "image"
@@ -13,7 +15,7 @@ def getFileIcon(ext):
         return "archive"
     elif ext in ["iso", "img", "bin", "cue", "toast", "vcd", "cdr", "dvd", "bin", "bak", "bup"]:
         return "storage"
-    elif ext in ["html", "css", "js", "py", "cpp", "c", "csharp", "java", "cs", "json", "xml", "yml", "yaml"]:
+    elif ext in sourceCodeFormats: # ["html", "css", "js", "py", "cpp", "c", "csharp", "java", "cs", "json", "xml", "yml", "yaml"]:
         return "code"
     else:
         return "insert_drive_file"
