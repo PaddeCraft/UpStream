@@ -284,7 +284,7 @@ def upload(path):
         file.save(fp)
         return redirect(f"/explore/{path}")
     else:
-        return error(pth)
+        return handleError(pth)
 
 
 @app.route("/api/isProcessing/<_uuid>")
