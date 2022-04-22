@@ -18,9 +18,10 @@ from operator import itemgetter
 import os
 import time
 import json
-import glob
 import typer
 import socket
+import atexit
+import shutil
 import logging
 import zipfile
 import pathlib
@@ -284,6 +285,15 @@ def isProcessing(_uuid):
     )
 
 
+def removeTmpDir():
+    try:
+        shutil.rmtree(os.path.join(basePath, "upstream-tmp"))
+        log.success("Removed temporary directory")
+    except Exception:
+        log.error("Temporary directory could not be removed.")
+        log.error("Maybe it was not created, or there was an other problem.")
+        log.error("You may check if it still exists: " + os.path.join(basePath, "upstream-tmp"))
+
 def main(port: int = 55555, directory: str = ".", folderSizeDisplay: bool = False, host: str = "0.0.0.0"):
     global basePath
     global _showSizeForFolders
@@ -300,22 +310,23 @@ def main(port: int = 55555, directory: str = ".", folderSizeDisplay: bool = Fals
         exit(1)
     with app.app_context():
         log.success(f"Running on {ip}:{port}")
-    try:
-        print("")
-        app.run(host=host, port=port, use_reloader=False)
-    except:
-        try:
-            log.info("Removing temporary files, please wait...")
-            os.rmdir(os.path.join(basePath, "upstream-tmp"))
-            log.success("Done")
-            exit(0)
-        except:
-            log.error(
-                "Failed to remove temporary files at "
-                + os.path.join(basePath, "upstream-tmp")
-                + ". You need to do this mannually."
-            )
-            exit(1)
+        atexit.register(removeTmpDir)
+    # try:
+    print("")
+    app.run(host=host, port=port, use_reloader=False)
+    # except:
+    #     try:
+    #         log.info("Removing temporary files, please wait...")
+    #         os.rmdir(os.path.join(basePath, "upstream-tmp"))
+    #         log.success("Done")
+    #         exit(0)
+    #     except:
+    #         log.error(
+    #             "Failed to remove temporary files at "
+    #             + os.path.join(basePath, "upstream-tmp")
+    #             + ". You need to do this mannually."
+    #         )
+    #         exit(1)
 
 
 if __name__ == "__main__":
