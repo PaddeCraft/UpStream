@@ -89,7 +89,7 @@ def breadcrumbGenerator(path):
                 {
                     "name": crumb,
                     "type": "dir" if isDir else "file",
-                    "link": "" + "/".join(breadcrumbNames) + "/" + crumb,
+                    "link": "/explore/~/" + "/".join(breadcrumbNames) + "/" + crumb,
                 }
             )
     return breadcrumbs
