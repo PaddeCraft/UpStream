@@ -5,6 +5,7 @@ UpStream is an [UpDog](https://pypi.org/project/updog/)-like client with a desig
 ## UI
 
 UpStream uses the [DaisyUI](https://daisyui.com/)-components for [Tailwind-CSS](https://tailwindcss.com/).
+Also, [Prism](https://prismjs.com) is used for code preview.
 
 ## Docs and installation
 
