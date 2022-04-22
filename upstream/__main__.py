@@ -1,4 +1,3 @@
-from genericpath import exists
 from log4py.log4py import logger
 from flask import (
     Flask,
