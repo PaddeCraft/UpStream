@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.14.1/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{ error }} | UpStream</title>
+    <script>
+        code = parseInt("{{ error }}");
+
+        const delay = (seconds) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+        async function removeFadeOut(el, speed) {
+            // https://stackoverflow.com/a/33424474
+            var seconds = speed / 1000;
+            el.style.transition = "opacity " + seconds + "s ease";
+            el.style.opacity = 0;
+            setTimeout(await function () {
+                el.parentNode.removeChild(el);
+            }, speed);
+            }
+
+        setTimeout(
+            async function () {
+                while (code > 0) {
+                    code = code - 1;
+                    document.getElementById("code").innerHTML = code;
+                    await delay(0.02);
+                }
+                setTimeout(
+                    async function () {
+                        await removeFadeOut(document.getElementById("main"), 3000);
+                        window.location.href = "/";
+                    },
+                    500
+                );
+            }, 4000);
+        
+    </script>
+</head>
+<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+    <div class="flex flex-row min-h-screen justify-center items-center" id="main">
+        <div class="color-white">
+            <div class="text-9xl flex justify-center items-center" id = "code">{{ error }}</div>
+            <div class="text-3xl flex justify-center items-center">{{ message }}</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,3 +1,4 @@
+from genericpath import exists
 from log4py.log4py import logger
 from flask import (
     Flask,
@@ -132,15 +133,38 @@ def zipFolder(path, files, processUUID):
         list(map(itemgetter("uuid"), zippingProcesses)).index(processUUID)
     )
 
+def handleError(pth):
+    if os.path.exists(pth) and not os.access(pth, os.R_OK):
+        abort(403)
+    elif not os.path.exists(pth):
+        abort(404)
+    else:
+        return True
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("error.html", error=404, message="Not found"), 404
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template("error.html", error=403, message="Access denied"), 403
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template("error.html", error=500, message="Internal server error"), 500
 
 @app.route("/")
 def index():
     return redirect("/explore/~/")
 
+@app.route("/explore/")
+def explore_blank():
+    abort(404)
 
 @app.route("/explore/<path:path>")
 def explore(path):
     pth = getPath(path)
+    handleError(pth)
     if os.path.isdir(pth):
         files = []
         for f in os.listdir(pth):
@@ -181,7 +205,7 @@ def explore(path):
             title=title,
             currentPath=path.replace("\\", "/"),
         )
-    else:
+    elif os.path.isfile(pth):
         pth = getPath(path)
         ext = pathlib.Path(pth).suffix.lower()[1:]
         dwnLoadPath = "/download/" + path
@@ -212,6 +236,7 @@ def explore(path):
 def download(path):
     global zippingProcesses
     pth = getPath(path)
+    handleError(pth)
     log.info(f"New download from path {pth}")
     if os.path.isfile(pth):
         log.info(f"Sending single file")
@@ -221,7 +246,7 @@ def download(path):
                 "Content-Disposition": f'attachment; filename={pth.split("/")[-1]}',
             },
         )
-    else:
+    elif os.path.isdir(pth):
         filesToZip = []
         requestedFileStr = request.args.get("files")
         if requestedFileStr == "*":
@@ -245,17 +270,21 @@ def download(path):
 
 @app.route("/upload/<path:path>", methods=["POST"])
 def upload(path):
-    if 'file' not in request.files:
-        return abort(400)
-    file = request.files['file']
-    if file.filename == '':
+    pth = getPath(path)
+    if os.path.isdir(pth) and os.access(pth, os.W_OK):
+        if 'file' not in request.files:
+            return abort(400)
+        file = request.files['file']
+        if file.filename == '':
+            return redirect(f"/explore/{path}")
+        filename = secure_filename(file.filename)
+        fp = os.path.join(pth, filename)
+        while os.path.exists(fp):
+            fp = fp + ".removeme"
+        file.save(fp)
         return redirect(f"/explore/{path}")
-    filename = secure_filename(file.filename)
-    fp = os.path.join(getPath(path), filename)
-    while os.path.exists(fp):
-        fp = fp + ".removeme"
-    file.save(fp)
-    return redirect(f"/explore/{path}")
+    else:
+        return error(pth)
 
 
 @app.route("/api/isProcessing/<_uuid>")
