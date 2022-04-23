@@ -15,8 +15,8 @@
         window.location.href = dwnLoadPath.href;
     }
 </script>
-<div style="display: table"><div style="display: table-cell"><span onclick="dwnload()"><span class="material-icons-outlined mdi-24px">file_download</span></span></div><div style="display: table-cell" class="pl-10"><form method=post action="/upload/{{ currentPath }}" enctype=multipart/form-data>
-    <label for="fileUpload"><span class="material-icons-outlined mdi-24px">checklist_rtl</span></label>
+<div style="display: table"><div style="display: table-cell"><span onclick="dwnload()"><span class="material-icons-outlined mdi-24px cursor-pointer">file_download</span></span></div><div style="display: table-cell" class="pl-10"><form method=post action="/upload/{{ currentPath }}" enctype=multipart/form-data>
+    <label for="fileUpload"><span class="material-icons-outlined mdi-24px cursor-pointer">checklist_rtl</span></label>
     <input class="btn fileUpload" id = "fileUpload" type=file name=file>
     <!--- <label for="fileUploadSubmit"><span class="material-icons-outlined mdi-24px">file_upload</span></label> --->
     <input class="btn" id = "fileUploadSubmit "type=submit value=Upload>
