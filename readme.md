@@ -9,4 +9,4 @@ Also, [Prism](https://prismjs.com) is used for code preview.
 
 ## Docs and installation
 
-Docs are located [here](https://paddecraft.github.io/docs/upstream/).
+Docs are located [here](https://paddecraft.github.io/UpStream/docs/).
