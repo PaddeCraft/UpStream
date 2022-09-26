@@ -1,0 +1,27 @@
+<!doctypehtml><html lang=en><meta charset=UTF-8><meta content="IE=edge"http-equiv=X-UA-Compatible><meta content="width=device-width,initial-scale=1"name=viewport><title>Docs</title><link href="https://fonts.googleapis.com/css?family=Nunito"rel=stylesheet><link href=/assets/docs-codehilie.css rel=stylesheet><link href=/assets/docs.css rel=stylesheet><script>function resizeSidebar(){window.matchMedia("(min-width: 800px)").matches?(document.getElementById("tree").style.height=document.getElementById("main").offsetHeight+"px",document.getElementById("tree").style.borderBottom="none"):(document.getElementById("tree").style.height="100%",document.getElementById("tree").style.borderBottom="1px solid")}document.addEventListener("DOMContentLoaded",function(){resizeSidebar(),window.addEventListener("resize",resizeSidebar),document.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach(function(e){"tableofcontents"!=e.id&&(e.classList.add("headerlink"),id=e.innerText,e.id="headerlink-"+id.replaceAll(" ","-").toLowerCase(),e.addEventListener("click",function(e){url=new URL(window.location.href),url.searchParams.set("jumpto",e.target.id),navigator.clipboard.writeText(url.toString()),window.location.href=url.toString()}))}),setTimeout(function(){url=new URL(window.location.href),jumpto=url.searchParams.get("jumpto"),null!=jumpto&&document.getElementById(jumpto).scrollIntoView(!0)},200)})</script><div id=wrapper><div id=tree><h2 id=tableofcontents>Table of contents</h2><ul><li><a href='/docs/index.html'><span>UpStream</span></a></li><li><a href='/docs/developement.html'><span>Developers guide for UpStream</span></a></li></ul></div><div id=main><h1>UpStream</h1>
+<h2>Overview</h2>
+<p>Upstream is a command-line utility to explore files via a web browser.<br />
+It should be very simple to use.</p>
+<h2>Disclaimer</h2>
+<p>This is still work-in-progress. If you experiance a bug or have a feature-request, open an issue.</p>
+<h2>Requirements</h2>
+<ul>
+<li>Python 3</li>
+<li>Pip(x)</li>
+</ul>
+<h2>Installation</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Latest release</span>
+python3 -m pip install https://api.github.com/repos/PaddeCraft/UpStream/zipball
+
+<span class="c1"># Developement version</span>
+python3 -m pip install git+https://github.com/PaddeCraft/UpStream.git
+</code></pre></div>
+
+<h2>Usage</h2>
+<div class="codehilite"><pre><span></span><code>python3 -m upstream --port <span class="nv">INT</span>          <span class="o">=</span> <span class="m">55555</span>
+                    --directory <span class="nv">PATH</span>    <span class="o">=</span> .
+                    --host              <span class="o">=</span> <span class="m">0</span>.0.0.0
+                    --foldersizedisplay <span class="o">=</span> <span class="nb">false</span>     <span class="c1"># Don´t use for big directories,</span>
+                                                    <span class="c1"># because it needs to read the size</span>
+                                                    <span class="c1"># of every single file.</span>
+</code></pre></div></div></div>
