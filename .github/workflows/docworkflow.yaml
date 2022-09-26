@@ -31,7 +31,7 @@ jobs:
             - name: Build Docs
               run: python3 docgen.py
             - name: Clean Up
-              run: rm docgen-requirements.txt docgen.py
+              run: rm docgen-requirements.txt docgen.py --reponame UpStream
             - name: Publish Documentation
               uses: stefanzweifel/git-auto-commit-action@v4
               with:
