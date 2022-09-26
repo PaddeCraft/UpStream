@@ -13,19 +13,19 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Setup Python
-              uses: uses: actions/setup-python@v4
+              uses: actions/setup-python@v4
               with:
-                python-version: "3.10"
+                  python-version: "3.10"
             - name: Download Documentation Generator
               uses: suisei-cn/actions-download-file@v1.0.1
               with:
-                url: "https://paddecraft.github.io/internal/docgen.py"
-                target: .
+                  url: "https://paddecraft.github.io/internal/docgen.py"
+                  target: .
             - name: Download Documentation Generator Requirements
               uses: suisei-cn/actions-download-file@v1.0.1
               with:
-                url: "https://paddecraft.github.io/internal/docgen-requirements.txt"
-                target: .
+                  url: "https://paddecraft.github.io/internal/docgen-requirements.txt"
+                  target: .
             - name: Install Requirements
               run: python3 -m pip install -r docgen-requirements.txt
             - name: Build Docs
@@ -35,5 +35,5 @@ jobs:
             - name: Publish Documentation
               uses: stefanzweifel/git-auto-commit-action@v4
               with:
-                 commit_message: build docs
-                 create_branch: false
+                  commit_message: build docs
+                  create_branch: false
