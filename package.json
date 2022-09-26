@@ -1,8 +1,12 @@
 {
-  "devDependencies": {
-    "tailwindcss": "^3.0.24"
-  },
-  "dependencies": {
-    "daisyui": "^2.14.1"
-  }
+    "devDependencies": {
+        "tailwindcss": "^3.0.24"
+    },
+    "dependencies": {
+        "daisyui": "^2.14.1"
+    },
+    "scripts": {
+        "css": "npx tailwindcss -i ./tailwindcss-src.css -o ./upstream/static/main.css --watch",
+        "installandrun": "python3 -m pip install . && python3 -m upstream"
+    }
 }
