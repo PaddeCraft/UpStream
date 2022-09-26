@@ -3,4 +3,3 @@ upstream-tmp
 upstream.egg-info
 node_modules
 build
-docs
