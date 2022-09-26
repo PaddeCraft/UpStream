@@ -29,9 +29,9 @@ jobs:
             - name: Install Requirements
               run: python3 -m pip install -r docgen-requirements.txt
             - name: Build Docs
-              run: python3 docgen.py
+              run: python3 docgen.py --reponame UpStream
             - name: Clean Up
-              run: rm docgen-requirements.txt docgen.py --reponame UpStream
+              run: rm docgen-requirements.txt docgen.py
             - name: Publish Documentation
               uses: stefanzweifel/git-auto-commit-action@v4
               with:
